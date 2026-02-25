@@ -35,13 +35,17 @@ export class ExecutionLoop {
     this.adapter = adapter;
     this.retryHandler = new RetryHandler();
     this.rollbackSystem = new RollbackSystem();
-    this.fileGuardian = new FileGuardian();
+    this.fileGuardian = new FileGuardian(this.rollbackSystem);
     this.contextService = contextService;
     this.hookManager = hookManager || new HookManager();
   }
 
   async start() {
     this.stateMachine.transitionTo(ExecutionState.EXECUTING);
+
+    // Backup project before starting the loop to ensure full rollback capability
+    this.rollbackSystem.backupProject(process.cwd(), ['node_modules', 'dist', '.git', '.sentinel']);
+
     this.fileGuardian.start();
 
     try {
@@ -129,11 +133,15 @@ export class ExecutionLoop {
       const changes = JSON.parse(jsonContent);
       if (Array.isArray(changes)) {
         changes.forEach(change => {
-          const dir = path.dirname(change.path);
+          const absolutePath = path.resolve(process.cwd(), change.path);
+          if (!absolutePath.startsWith(process.cwd())) {
+            throw new Error(`Path traversal attempt detected: ${change.path}`);
+          }
+          const dir = path.dirname(absolutePath);
           if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
           }
-          fs.writeFileSync(change.path, change.content);
+          fs.writeFileSync(absolutePath, change.content);
           console.log(`Applied changes to ${change.path}`);
         });
       }

@@ -7,8 +7,8 @@ export class FileGuardian {
   private allowedFiles: Set<string> = new Set();
   private rollbackSystem: RollbackSystem;
 
-  constructor() {
-    this.rollbackSystem = new RollbackSystem();
+  constructor(rollbackSystem?: RollbackSystem) {
+    this.rollbackSystem = rollbackSystem || new RollbackSystem();
   }
 
   public setAllowedFiles(files: string[]) {
@@ -21,12 +21,16 @@ export class FileGuardian {
       persistent: true
     });
 
-    this.watcher.on('change', (path) => {
+    const handleUnauthorized = (path: string, type: string) => {
       if (!this.allowedFiles.has(path) && !this.isSentinelFile(path)) {
-        console.warn(`Unauthorized modification detected: ${path}. Rolling back...`);
+        console.warn(`Unauthorized ${type} detected: ${path}. Rolling back...`);
         this.rollbackSystem.rollback(path);
       }
-    });
+    };
+
+    this.watcher.on('change', (path) => handleUnauthorized(path, 'modification'));
+    this.watcher.on('add', (path) => handleUnauthorized(path, 'addition'));
+    this.watcher.on('unlink', (path) => handleUnauthorized(path, 'deletion'));
   }
 
   public stop() {
