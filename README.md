@@ -15,16 +15,43 @@ Sentinel Kernel is a deterministic execution governance runtime for AI coding ag
 
 ## Installation
 
-You can run Sentinel Kernel directly via `npx`:
+> **Note**: Sentinel Kernel is currently in development and is not yet published to the public npm registry. To use it locally, follow the **Local Installation** instructions below.
+
+### Local Installation (For Development/Testing)
+
+To use the `sentinel` command globally on your machine while the project is in development:
+
+1. Clone this repository.
+2. Navigate to the project directory:
+   ```bash
+   cd sentinel-kernel
+   ```
+3. Install dependencies and build the project:
+   ```bash
+   npm install
+   npm run build
+   ```
+4. Link the package globally:
+   ```bash
+   npm link
+   ```
+
+Now you can run the `sentinel` command from anywhere on your system.
+
+### Local Execution (Without Global Install)
+
+If you don't want to install it globally, you can run it directly from the project root:
 
 ```bash
-npx sentinel-kernel@latest init
+node dist/index.js init
 ```
 
-Or install it globally:
+### Running via npx (Once Published)
+
+Once the package is published to a registry, you will be able to run it directly:
 
 ```bash
-npm install -g sentinel-kernel
+npx sentinel-kernel init
 ```
 
 ## CLI Commands
