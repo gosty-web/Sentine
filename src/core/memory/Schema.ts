@@ -1,0 +1,17 @@
+export const SCHEMA = `
+CREATE TABLE IF NOT EXISTS memory (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  type TEXT NOT NULL,
+  content TEXT NOT NULL,
+  metadata TEXT,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id TEXT PRIMARY KEY,
+  description TEXT NOT NULL,
+  status TEXT NOT NULL,
+  affected_files TEXT,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+`;

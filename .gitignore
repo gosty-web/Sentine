@@ -1,0 +1,6 @@
+node_modules
+dist
+.sentinel
+*.log
+coverage
+help_output.txt
